@@ -7,11 +7,11 @@ from flask import Flask, request, render_template
 app = Flask(__name__)
 
 # 获取环境变量
-host = os.environ.get('DB_HOST')
-user = os.environ.get('DB_USER') 
-passwd = os.environ.get('DB_PASSWD')
-db = os.environ.get('DB_NAME')
-port = os.environ.get('DB_PORT')
+host = os.environ.get('MYSQL_HOST')
+user = os.environ.get('MYSQL_USER') 
+passwd = os.environ.get('MYSQL_PASSWORD')
+db = os.environ.get('MYSQL_NAME')
+port = os.environ.get('MYSQL_PORT')
 # 连接数据库
 db = pymysql.connect(host=host, user=user, passwd=passwd, db=db, port=port)
 cursor = db.cursor() 
