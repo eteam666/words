@@ -8,7 +8,7 @@ app = Flask(__name__)
 
 # 获取环境变量
 host = os.environ.get('MYSQL_HOST')
-user = os.environ.get('MYSQL_USER') 
+user = os.environ.get('MYSQL_USERNAME') 
 passwd = os.environ.get('MYSQL_PASSWORD')
 db = os.environ.get('MYSQL_NAME')
 port = os.environ.get('MYSQL_PORT')
