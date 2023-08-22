@@ -1,7 +1,8 @@
 import os
-from flask import Flask, render_template, request
+import requests 
+import xml.etree.ElementTree as ET
 import pymysql
-from google.cloud import translate
+from flask import Flask, request, render_template
 
 app = Flask(__name__)
 
@@ -15,27 +16,25 @@ port = os.environ.get('DB_PORT')
 db = pymysql.connect(host=host, user=user, passwd=passwd, db=db, port=port)
 cursor = db.cursor() 
 
-# 创建翻译客户端
-translate_client = translate.Client()
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/', methods=['GET', 'POST'])  
 def index():
-
   if request.method == 'POST':
-    english_lines = request.form['english'].split('\n')
-      
+    text = request.form['text']
     id = request.form['id']
+    url = f'http://api.microsofttranslator.com/v2/Http.svc/Translate?appId=AFC76A66CF4F434ED080D245C30CF1E71C22959C&from=&to=zh&text={text}'
+    response = requests.get(url)
+    result = response.text
+    root = ET.fromstring(result)
+
+    translated_text = root.find('string').text
     
-    for line in english_lines:
-      english_word = line.strip()
-      if english_word:  
-        translation = translate_client.translate(english_word, target_language='zh-CN')
-        chinese = translation['translatedText']
-        
-        cursor.execute("INSERT INTO words (id, english, chinese) VALUES (%s, %s, %s)", (id, english_word, chinese))
-        db.commit()
+    # 保存到数据库
+    insert_sql = "INSERT INTO translations (id, english, chinese) VALUES (%s, %s, %s)"
+    cursor.execute(insert_sql, (id, text, translated_text)) 
+    db.commit()
 
   return render_template('index.html')
 
 if __name__ == '__main__':
-  app.run()
+    app.run()
